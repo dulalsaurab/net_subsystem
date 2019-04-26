@@ -9,7 +9,7 @@ import pickle
 from timeit import default_timer
 
 
-path="/Users/saurabdulal/Documents/PROJECTS/STUDY_NETSUS/linux"
+path=".." #path to a Linux repository
 os.chdir(path)
 
 netSusSubModules = ["NET: ", "6LOWPAN: ","802: ","8021Q: ","9P: ","KCONFIG: ","MAKEFILE: ","APPLETALK: ",
@@ -37,8 +37,12 @@ def processModificationStatus(ms):
     linesAdded = linesDeleted = 0
     fileChanged = ms[0].strip().split(" ")[0]
     try:
-        if ms[1] and "insertion" in ms[1]:
-            linesAdded = ms[1].strip().split(" ")[0]
+        if ms[1]:
+            if "insertion" in ms[1]:
+                linesAdded = ms[1].strip().split(" ")[0]
+            else:
+                # if this case occurs, just return from here
+                linesDeleted = ms[1].strip().split(" ")[0]    
 
         if ms[2] and "deletion" in ms[2]:
             linesDeleted = ms[2].strip().split(" ")[0]
@@ -52,6 +56,8 @@ def processModificationStatus(ms):
 
 def processCommitMessage(message):
     
+    if message == None:
+        return None
     # This function returns back data
     data = None
 
@@ -89,13 +95,13 @@ def processCommitMessage(message):
         "subModuleName" : subModulesNames,        
         "isCore" : flagDrivers,                     #is core net or driver 
         "isBugFix" : bugFix}
-    
-    print(data)
 
     return data
 
 def processHash(_hash):
     command = "git show "+_hash.strip()+" --stat"
+    print("Process hash:", command)
+    comment = None
     try:
         proc = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True)
         (out, err) = proc.communicate()
@@ -117,7 +123,7 @@ def hashTillDate():
     #date = '2006'
     #command = "git log --date=short --since='April 8 "+date+"' --pretty=format:\"%h%x09%<(20)%an%x09%ad%x09%cd%x09%s\" | awk '{print $1}'"
     
-    command = "git log --date=short --since='Thu Jan 12 06:11:26 2006 +0200' --before='Mon Nov 7 21:14:43 2011 +0100' --pretty=format:\"%h%x09%<(20)%an%x09%ad%x09%cd%x09%s\" | awk '{print $1}'"
+    command = "git log --date=short --since='Thu Jan 12 06:11:26 2006 +0200' --before='Fri Jul 29 17:31:16 2011 +0200' --pretty=format:\"%h%x09%<(20)%an%x09%ad%x09%cd%x09%s\" | awk '{print $1}'"
     
     try:
         proc = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True)
@@ -131,7 +137,7 @@ def hashTillDate():
         data = processHash(_hash.strip("\"").strip()) #just to make sure _hash is clean
         if data:
             try:
-                print("Data save:", data, _hash)
+                # print("Data save:", data, _hash)
                 dbObj.insertData(data, netSusCol)
             except Exception as e:
                 unsavedHash.append(date['commitID'])

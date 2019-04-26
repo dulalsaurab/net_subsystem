@@ -32,11 +32,3 @@ class DbConnection():
         name = db.collectionname
         collectionLists.append(name)
         return name
-
-#     dbObj = DbConnection();
-#     database = dbObj.client.netSus
-
-
-
-# lowpanC = database.lowpan
-
