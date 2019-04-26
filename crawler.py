@@ -1,5 +1,7 @@
 
 '''
+IMP: file obsolete
+
 @author: Saurab Dulal (sdulal@memphis.edu, The University of Memphis)
 This is a python crawler to crawl all the Linux patches released in the last 15 years and get all the patches 
 developed for netsubsystem
